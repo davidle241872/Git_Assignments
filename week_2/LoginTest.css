@@ -1,0 +1,13 @@
+
+.img
+{   
+    flex: absolute;
+    height: 100%;
+}
+
+.imgB
+{
+    flex: absolute;
+    height: 400px;
+    float: inline-end;
+}
