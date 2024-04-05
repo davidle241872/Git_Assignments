@@ -12,6 +12,7 @@
 
 Both query and path parameters can be accessed in javascript using the req(request)
 object. i.e req.params
+-------------------------------------------------------------------------------------------------
 */
 
 //Imports express from the node_modules folder
@@ -53,6 +54,10 @@ function clientError(req, message, errorCode){
     }))
 }
 
+/*
+Middleware:
+    Creates a log for every API call
+*/
 
 app.all('/*', (req, res, next)=> {
     clientID++
