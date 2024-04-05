@@ -36,6 +36,7 @@ const logger = winston.createLogger({
 
 let todos = [];
 let number_of_todos = 1;
+let clientID = 0;
 
 function clientError(req, message, errorCode){
     (logger.log({
@@ -54,6 +55,7 @@ function clientError(req, message, errorCode){
 
 
 app.all('/*', (req, res, next)=> {
+    clientID++
     logger.log({
         level: 'info',
         endpoint: req.path,
@@ -68,6 +70,14 @@ app.all('/*', (req, res, next)=> {
 })
 
 // GET requests should never have a body
+
+
+/*
+Endpoint: 
+    returns a list of all todos, if an id is provided, only a single todo is returned
+Query Parameters: 
+    id[number]: the id of the todo
+*/
 
 // Returns entire todolist or return a single todo
 app.get('/todo', (req, res)=> {
@@ -88,7 +98,7 @@ app.get('/todo', (req, res)=> {
     else if((Object.keys(req.query).length != 0) && (Object.keys(req.query)[0] != "id")){
         clientError(req, "Query Parameters do not meet requirements", 400);
         res.status(401).json({error: "Query Parameters do not meet requirements at all!!!"});
-    }
+    } 
     // Checks to make sure that the id is a number
     else if(isNaN(req.query.id) && req.query.id != undefined){
         clientError(req, "id provided is not a number", 400);
@@ -124,7 +134,14 @@ app.get('/todo', (req, res)=> {
         }
     }
 })
-
+/* 
+Endpoint: 
+    Adds a todo to the list. If a list parameter is provided it adds multiple todos in
+    one call
+Body:
+    todo[string](required): the task to be added to the todolist
+    list[array]: contains several todos 
+*/
 // Adds a single task to the todolist
 app.post('/todo', (req, res)=> { 
     if(Object.keys(req.query).length > 1){ 
@@ -139,11 +156,11 @@ app.post('/todo', (req, res)=> {
         clientError(req, "id provided is not a number", 400);
         res.status(401).json({error: "id provided is not a number"});
     }
-    //console.log(req.body.list.length);
+   // console.log(req.body.list.length);
     //Check if there is an array called list
         if(req.body.list == undefined){
             // Add a single todo
-            todos.push({id: number_of_todos, todo: req.body.todo, completed: false});
+            todos.push({id: number_of_todos++, todo: req.body.todo, completed: false});
             // We can access the last element in an array using -1 as an index
             res.json({todo: todos[-1]});
         } else if(req.body.list.length > 0){
@@ -154,14 +171,28 @@ app.post('/todo', (req, res)=> {
     }
 })
 
+/* 
+Endpoint: 
+   Updates an existing todo and modifies its data
+
+Path parameter:
+    id[number](required):the id of the task to be updated in the todolist
+
+Body:
+    todo[string]: the task to be updated
+    completed[boolean]: the status of the task
+*/
+
 // Updates a todo task
 app.put('/todo/:id', (req, res)=> {
     if(Object.keys(req.query).length > 1){ 
         clientError(req, "Query Parameters do not meet requirements", 400);
         res.status(400).json({error: "Query Parameters do not meet requirements"});
+
     } else if((Object.keys(req.query).length != 0) && (Object.keys(req.query)[0] != "id")){
         clientError(req, "Query Parameters do not meet requirements", 400);
         res.status(401).json({error: "Query Parameters do not meet requirements at all!"});
+
     } else if(isNaN(req.query.id) && req.query.id != undefined){
         clientError(req, "id provided is not a number", 400);
         res.status(401).json({error: "id provided is not a number"});
@@ -182,8 +213,14 @@ app.put('/todo/:id', (req, res)=> {
     res.json(todos[match]);
 })
 
-//Deletes a task from the todolist
-// One person is looking for how to get a parameter from the client
+/* 
+Endpoint: 
+   Deletes an existing todo 
+   
+Path parameter:
+    id[number](required):the id of the task to be deleted in the todolist
+*/
+
 app.delete('/todo/:id', (req, res)=> {
     if(Object.keys(req.body).length != 0) {
     res.status(400).json({error: "Request body is not permitted"}); 
@@ -219,3 +256,7 @@ app.delete('/todo/:id', (req, res)=> {
 app.listen(3000, ()=> {
     console.log("Server is running on port 3000");
 })
+
+
+// =! check whether its two operands are not equal; convert & compare 
+// make sure to have able to store the data before the forloop
