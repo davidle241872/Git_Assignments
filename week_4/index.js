@@ -19,9 +19,11 @@ object. i.e req.params
 const express = require('express')
 const winston = require('winston')
 
+
 const app = express()
 const bodyParser = require('body-parser')
 app.use(bodyParser.json()) // for parsing application/json
+
 
 const logger = winston.createLogger({
     level: 'info',
@@ -32,6 +34,9 @@ const logger = winston.createLogger({
       new winston.transports.File({ filename: 'error.log', level: 'error' }),
       new winston.transports.File({ filename: 'combined.log' }),
     ],
+
+
+
 });
 
 
@@ -98,9 +103,9 @@ app.get('/todo', (req, res)=> {
     else if(Object.keys(req.query).length > 1){ 
         clientError(req, "Query Parameters do not meet requirements", 400);
         res.status(400).json({error: "Query Parameters do not meet requirements"});
-    }
+     
     // Ensures no parameter other than list or id are passed
-    else if((Object.keys(req.query).length != 0) && (Object.keys(req.query)[0] != "id")){
+ } else if((Object.keys(req.query).length != 0) && (Object.keys(req.query)[0] != "id")){
         clientError(req, "Query Parameters do not meet requirements", 400);
         res.status(401).json({error: "Query Parameters do not meet requirements at all!!!"});
     } 
@@ -108,9 +113,9 @@ app.get('/todo', (req, res)=> {
     else if(isNaN(req.query.id) && req.query.id != undefined){
         clientError(req, "id provided is not a number", 400);
         res.status(401).json({error: "id provided is not a number"});
-    }
+    } 
     // Request format was correct so we can proceed with the request
-    else {
+    else{
         // Check if an id was passed from the client, if no, return all todos
         if(req.query.id == undefined){
             res.json({todos});
@@ -153,17 +158,22 @@ app.post('/todo', (req, res)=> {
         clientError(req, "Query Parameters do not meet requirements", 400);
         res.status(400).json({error: "Query Parameters do not meet requirements"});
         
-    } else if(Object.keys(req.query).length > 1){ 
+    } else if((Object.keys(req.query).length !== 0) && (Object.keys(req.query)[0] !== "id")){
         clientError(req, "Query Parameters do not meet requirements", 400);
-        res.status(400).json({error: "Query Parameters do not meet requirements at all!!!"});
-
+        res.status(401).json({error: "Query Parameters do not meet requirements at all!!!"});
+    
     } else if(isNaN(req.query.id) && req.query.id != undefined){
         clientError(req, "id provided is not a number", 400);
         res.status(401).json({error: "id provided is not a number"});
-    }
+
+        //  } else if((isNan(req.query).length != 0) && req.query !== "$/"){
+        //      clientError(req, "invalid input within the parameters", 400);
+        //      res.status(401).json({error: "invalid input within the parameters"});
+         }
+
    // console.log(req.body.list.length);
     //Check if there is an array called list
-        if(req.body.list == undefined){
+    if(req.body.list == undefined){
             // Add a single todo
             todos.push({id: number_of_todos++, todo: req.body.todo, completed: false});
             // We can access the last element in an array using -1 as an index
@@ -215,7 +225,7 @@ app.put('/todo/:id', (req, res)=> {
         }
         match = todos[i];
     }
-    res.json(todos[match]);
+ res.json(todos[match]);
 })
 
 /* 
@@ -227,21 +237,42 @@ Path parameter:
 */
 
 app.delete('/todo/:id', (req, res)=> {
-    if(Object.keys(req.body).length != 0) {
-    res.status(400).json({error: "Request body is not permitted"}); 
-
-    } else if(Object.keys(req.query).length > 1){ 
+     if(Object.keys(req.query).length > 1){ 
         clientError(req, "Query Parameters do not meet requirements", 400);
         res.status(400).json({error: "Query Parameters do not meet requirements"});
-
+ 
+    
     } else if((Object.keys(req.query).length != 0) && (Object.keys(req.query)[0] != "id")){
         clientError(req, "Query Parameters do not meet requirements", 400);
-        res.status(401).json({error: "Query Parameters do not meet requirements"});
+        res.status(401).json({error: "Query Parameters do not meet requirements"}); 
+
+        app.delete('/todo/:id', (req, res)=> {
+            const { id } = req.params;
+            /*It then searches for the index of the todo item in an array called todos, presumably
+            containing all the todo items.It uses findIndex() to search for the todo with the given ID.*/
+            const todoIndex = todos.findIndex(todo => todo.id === parseInt(id));
+            /* If the todo item with its ID idn't found ex: the- (todoIndex is -1), the
+            server will respons with the client error (status code 400) and sends an error
+            message indicating that the todo with that ID was not found*/
+            if (todoIndex === -1) {
+                clientError(req, "Todo with that id not found", 400);
+                return res.status(400).json({ error: "Todo with that id not found" });
+            }
+            /*If the todo item is found ex:(todoIndex is not -1), it removes the todo item from the
+            todos array using the splice(). The deleted todo item then gets stored in the deletedTodo variable.*/
+            const deletedTodo = todos.splice(todoIndex, 1);
+            return res.json(deletedTodo[0]);
+        });
+
+        // Blocks any special characters 
+    // } else if((Object.keys(req.params) !== 0) && (Object.keys(req.params)[0] != "/^[a-zA-Z0-9\s]+$/")){
+    //     clientError(req, "invalid input", 400);
+    //     res.status(400).json({error: "invalid input"});   
 
     } else if(isNaN(req.query.id) && req.query.id != undefined){
         clientError(req, "id provided is not a number", 400);
         res.status(401).json({error: "id provided is not a number"});
-    }
+    } 
     // Stores the deleted todo
     let temp;
     // Search through the array for a todo that has an id that matches the client's request
