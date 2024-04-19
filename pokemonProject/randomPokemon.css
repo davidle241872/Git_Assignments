@@ -1,0 +1,87 @@
+body {
+    background-image: url("https://cdnb.artstation.com/p/assets/images/images/019/647/779/large/david-oswald-photo-jul-29-2-22-51-pm.jpg?1564424705");
+    background-repeat: no-repeat;
+
+  }
+
+  .pokemon {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 400px;
+    height: 250px;
+    border: 12px solid black;
+    border-radius: 10px;
+    background-color: black;
+}
+
+
+.pokemon2 {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 400px;
+    height: 250px;
+    border: 12px solid black;
+    border-radius: 25px;
+    background-color: black;
+}
+
+
+#mainBattleDiv {
+    display: flex;
+    justify-content: right; 
+}
+
+
+.pokemonImage {
+    object-fit: scale-down;
+    width: 200;
+    height: 170px;
+    
+}
+
+
+
+.battle-container {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 70.2%;
+    display: flex;
+    justify-content: space-between;
+    background-color: #e0e0e0;
+    padding: 2px;
+}
+
+
+.opponent,
+.player {
+    display: flex;
+    align-items: center;
+}
+
+.pokemon-info {
+    margin-left: 10px;
+}
+
+.hp-bar {
+    width: 100px;
+    height: 10px;
+    background-color: #ddd;
+    border-radius: 5px;
+}
+
+.hp-bar-fill {
+    height: 100%;
+    background-color: green;
+}
+
+.pokemon-name {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+
+
+
